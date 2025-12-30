@@ -1,129 +1,245 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { MessageSquare, Phone, Navigation, CreditCard, Music, Heart, Settings } from 'lucide-react';
-import { WatchHeader } from '@/components/watch/WatchHeader';
+import { useRouter } from 'next/navigation';
+import { MessageSquare, Navigation2, Music, Settings } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
+import { messagingService } from '@/services/MessagingService';
+import type { Message } from '@/models/types';
+
+type WatchMode = 'time' | 'chat' | 'nav' | 'media' | 'settings';
 
 export default function WatchHomePage() {
+  const router = useRouter();
   const weekendMode = useAppStore((state) => state.settings.weekendMode);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [mode, setMode] = useState<WatchMode>('time');
+  const [latestMessage, setLatestMessage] = useState<Message | null>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
 
+  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 60000); // Update every minute
-
+      setCurrentTime(new Date());
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
+  // Load latest message
+  useEffect(() => {
+    const loadLatest = async () => {
+      const threads = await messagingService.getThreads();
+      if (threads.length > 0) {
+        const messages = await messagingService.getMessagesForThread(threads[0].id);
+        if (messages.length > 0) {
+          setLatestMessage(messages[messages.length - 1]);
+        }
+      }
+    };
+    loadLatest();
+  }, []);
+
+  // Swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart) return;
+
+    const touchEnd = e.changedTouches[0].clientX;
+    const diff = touchStart - touchEnd;
+
+    // Swipe threshold
+    if (Math.abs(diff) > 50) {
+      const modes: WatchMode[] = weekendMode
+        ? ['time', 'chat', 'settings']
+        : ['time', 'chat', 'nav', 'media', 'settings'];
+
+      const currentIndex = modes.indexOf(mode);
+
+      if (diff > 0) {
+        // Swipe left - next mode
+        const nextIndex = (currentIndex + 1) % modes.length;
+        setMode(modes[nextIndex]);
+      } else {
+        // Swipe right - previous mode
+        const prevIndex = (currentIndex - 1 + modes.length) % modes.length;
+        setMode(modes[prevIndex]);
+      }
+    }
+
+    setTouchStart(null);
+  };
+
+  const formatTime = () => {
+    return currentTime.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: false,
     });
   };
 
-  const primaryTiles = [
-    {
-      href: '/watch/comm',
-      icon: MessageSquare,
-      label: 'Comms',
-      show: true,
-    },
-    {
-      href: '/watch/nav',
-      icon: Navigation,
-      label: 'Nav',
-      show: true,
-    },
-    {
-      href: '/watch/pay',
-      icon: CreditCard,
-      label: 'Pay',
-      show: true,
-    },
-    {
-      href: '/watch/media',
-      icon: Music,
-      label: 'Media',
-      show: !weekendMode,
-    },
-  ];
+  const formatDate = () => {
+    return currentTime.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    }).toUpperCase();
+  };
 
-  const secondaryTiles = [
-    {
-      href: '/watch/health',
-      icon: Heart,
-      label: 'Health',
-      show: !weekendMode,
-    },
-    {
-      href: '/watch/settings',
-      icon: Settings,
-      label: 'Settings',
-      show: !weekendMode,
-    },
-  ];
+  // Mode renderers
+  const renderTimeMode = () => (
+    <div
+      className="watch-mode"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Mode indicator */}
+      <div className="meta-text text-center mb-4">
+        {formatDate()}
+      </div>
 
+      {/* Hero time */}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="time-hero">{formatTime()}</div>
+      </div>
+
+      {/* Context: Latest notification */}
+      {latestMessage && !weekendMode && (
+        <div
+          className="border-t-2 border-black pt-4 cursor-pointer"
+          onClick={() => router.push('/watch/comm')}
+        >
+          <div className="meta-text mb-2">LATEST MESSAGE</div>
+          <div className="text-lg font-medium truncate">{latestMessage.sender}</div>
+          <div className="text-base opacity-60 truncate">{latestMessage.text}</div>
+        </div>
+      )}
+
+      {/* Swipe hint */}
+      <div className="gesture-hint gesture-hint-bottom">
+        SWIPE FOR MORE
+      </div>
+    </div>
+  );
+
+  const renderChatMode = () => (
+    <div
+      className="watch-mode"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="meta-text text-center mb-4">WHATSAPP</div>
+
+      <div className="context-card">
+        <MessageSquare size={80} strokeWidth={1.5} />
+        <div className="action-text mt-6">Messages</div>
+        {latestMessage && (
+          <div className="text-base opacity-60 mt-2 truncate w-full text-center">
+            {latestMessage.sender}
+          </div>
+        )}
+      </div>
+
+      <button
+        className="btn-watch"
+        onClick={() => router.push('/watch/comm')}
+      >
+        OPEN
+      </button>
+
+      <div className="gesture-hint gesture-hint-left">SWIPE</div>
+      <div className="gesture-hint gesture-hint-right">SWIPE</div>
+    </div>
+  );
+
+  const renderNavMode = () => (
+    <div
+      className="watch-mode"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="meta-text text-center mb-4">GOOGLE MAPS</div>
+
+      <div className="context-card">
+        <Navigation2 size={80} strokeWidth={1.5} />
+        <div className="action-text mt-6">Navigation</div>
+        <div className="text-base opacity-60 mt-2">Get directions</div>
+      </div>
+
+      <button
+        className="btn-watch"
+        onClick={() => router.push('/watch/nav')}
+      >
+        START
+      </button>
+
+      <div className="gesture-hint gesture-hint-left">SWIPE</div>
+      <div className="gesture-hint gesture-hint-right">SWIPE</div>
+    </div>
+  );
+
+  const renderMediaMode = () => (
+    <div
+      className="watch-mode"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="meta-text text-center mb-4">SPOTIFY</div>
+
+      <div className="context-card">
+        <Music size={80} strokeWidth={1.5} />
+        <div className="action-text mt-6">Music</div>
+        <div className="text-base opacity-60 mt-2">Control playback</div>
+      </div>
+
+      <button
+        className="btn-watch"
+        onClick={() => router.push('/watch/media')}
+      >
+        OPEN
+      </button>
+
+      <div className="gesture-hint gesture-hint-left">SWIPE</div>
+      <div className="gesture-hint gesture-hint-right">SWIPE</div>
+    </div>
+  );
+
+  const renderSettingsMode = () => (
+    <div
+      className="watch-mode"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="meta-text text-center mb-4">SETTINGS</div>
+
+      <div className="context-card">
+        <Settings size={80} strokeWidth={1.5} />
+        <div className="action-text mt-6">Settings</div>
+        <div className="text-base opacity-60 mt-2">Customize your watch</div>
+      </div>
+
+      <button
+        className="btn-watch"
+        onClick={() => router.push('/watch/settings')}
+      >
+        OPEN
+      </button>
+
+      <div className="gesture-hint gesture-hint-left">SWIPE</div>
+      <div className="gesture-hint gesture-hint-right">SWIPE</div>
+    </div>
+  );
+
+  // Render current mode
   return (
-    <div className="flex flex-col h-screen">
-      <WatchHeader />
-
-      <main className="flex-1 overflow-auto p-4">
-        {/* Date display */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold">
-            {currentDate.toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-            })}
-          </h2>
-          <p className="text-sm text-gray-dark">{formatDate(currentDate)}</p>
-        </div>
-
-        {weekendMode && (
-          <div className="mb-4 border border-black p-2 text-center">
-            <p className="text-xs font-medium">Weekend Mode Active</p>
-          </div>
-        )}
-
-        {/* Primary tiles grid */}
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          {primaryTiles
-            .filter((tile) => tile.show)
-            .map((tile) => (
-              <Link
-                key={tile.href}
-                href={tile.href}
-                className="card aspect-square flex flex-col items-center justify-center gap-2 hover:bg-hatch-pattern transition-all active:opacity-50"
-              >
-                <tile.icon className="w-8 h-8" strokeWidth={1.5} />
-                <span className="text-sm font-medium">{tile.label}</span>
-              </Link>
-            ))}
-        </div>
-
-        {/* Secondary tiles */}
-        {!weekendMode && (
-          <div className="grid grid-cols-2 gap-3">
-            {secondaryTiles
-              .filter((tile) => tile.show)
-              .map((tile) => (
-                <Link
-                  key={tile.href}
-                  href={tile.href}
-                  className="border border-black p-3 flex items-center gap-2 hover:bg-hatch-pattern transition-all active:opacity-50"
-                >
-                  <tile.icon className="w-5 h-5" strokeWidth={1.5} />
-                  <span className="text-sm font-medium">{tile.label}</span>
-                </Link>
-              ))}
-          </div>
-        )}
-      </main>
+    <div className="watch-container">
+      {mode === 'time' && renderTimeMode()}
+      {mode === 'chat' && renderChatMode()}
+      {mode === 'nav' && !weekendMode && renderNavMode()}
+      {mode === 'media' && !weekendMode && renderMediaMode()}
+      {mode === 'settings' && renderSettingsMode()}
     </div>
   );
 }

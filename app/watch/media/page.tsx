@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { WatchHeader } from '@/components/watch/WatchHeader';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { mediaService } from '@/services/MediaService';
-import type { MediaState, OutputDevice } from '@/models/types';
-import { Play, Pause, SkipForward, Volume2, Watch, Car, Headphones, Speaker } from 'lucide-react';
+import type { MediaState } from '@/models/types';
 
 export default function MediaPage() {
+  const router = useRouter();
   const [mediaState, setMediaState] = useState<MediaState | null>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
 
   useEffect(() => {
     loadMediaState();
@@ -29,8 +31,13 @@ export default function MediaPage() {
     loadMediaState();
   };
 
-  const handleSkip = async () => {
-    await mediaService.skip();
+  const handleSkip = async (direction: 'forward' | 'back') => {
+    if (direction === 'forward') {
+      await mediaService.skip();
+    } else {
+      // Skip back - for now just restart
+      await mediaService.play();
+    }
     loadMediaState();
   };
 
@@ -41,32 +48,40 @@ export default function MediaPage() {
     loadMediaState();
   };
 
-  const handleOutputDevice = async (device: OutputDevice) => {
-    await mediaService.setOutputDevice(device);
-    loadMediaState();
+  // Swipe navigation for skip
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX);
   };
 
-  const getDeviceIcon = (device: OutputDevice) => {
-    switch (device) {
-      case 'watch':
-        return Watch;
-      case 'car':
-        return Car;
-      case 'earbuds':
-        return Headphones;
-      case 'speaker':
-        return Speaker;
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart) return;
+
+    const touchEnd = e.changedTouches[0].clientX;
+    const diff = touchStart - touchEnd;
+
+    // Swipe threshold
+    if (Math.abs(diff) > 80) {
+      if (diff > 0) {
+        handleSkip('forward');
+      } else {
+        handleSkip('back');
+      }
     }
+
+    setTouchStart(null);
   };
 
-  const outputDevices: OutputDevice[] = ['watch', 'car', 'earbuds', 'speaker'];
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   if (!mediaState) {
     return (
-      <div className="flex flex-col h-screen">
-        <WatchHeader title="Media" showBack backHref="/watch" />
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-sm text-gray-dark">Loading...</p>
+      <div className="watch-container">
+        <div className="watch-mode">
+          <div className="meta-text text-center">LOADING...</div>
         </div>
       </div>
     );
@@ -75,90 +90,108 @@ export default function MediaPage() {
   const hasTrack = mediaState.trackTitle !== 'Nothing playing';
 
   return (
-    <div className="flex flex-col h-screen">
-      <WatchHeader title="Media" showBack backHref="/watch" />
+    <div className="watch-container">
+      <div
+        className="watch-mode"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => router.push('/watch')}>
+            <ArrowLeft size={24} strokeWidth={2} />
+          </button>
+          <div className="meta-text">SPOTIFY</div>
+          <button onClick={() => handleVolumeChange(mediaState.volumePercent > 0 ? -100 : 50)}>
+            {mediaState.volumePercent === 0 ? (
+              <VolumeX size={24} strokeWidth={2} />
+            ) : (
+              <Volume2 size={24} strokeWidth={2} />
+            )}
+          </button>
+        </div>
 
-      <main className="flex-1 overflow-auto p-3 space-y-4">
-        {/* Now playing */}
-        <div className="card text-center">
-          <div className="text-xs text-gray-dark mb-2">Now Playing</div>
-          <div className="font-bold text-lg mb-1">
-            {mediaState.trackTitle}
+        {/* Now playing info */}
+        <div className="text-center mb-8">
+          <div className="text-lg font-bold mb-2 truncate">
+            {hasTrack ? mediaState.trackTitle : 'Not Playing'}
           </div>
           {hasTrack && (
             <>
-              <div className="text-sm text-gray-dark mb-2">
+              <div className="text-base opacity-60 truncate mb-4">
                 {mediaState.artist}
               </div>
-              <div className="text-xs text-gray-dark">
-                {Math.floor(mediaState.positionSec / 60)}:
-                {(mediaState.positionSec % 60).toString().padStart(2, '0')} /{' '}
-                {Math.floor(mediaState.durationSec / 60)}:
-                {(mediaState.durationSec % 60).toString().padStart(2, '0')}
+              <div className="meta-text">
+                {formatTime(mediaState.positionSec)} / {formatTime(mediaState.durationSec)}
               </div>
             </>
           )}
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center justify-center gap-3">
-          <button onClick={handlePlayPause} className="btn-primary p-4">
+        {/* Giant play/pause button */}
+        <div className="flex-1 flex items-center justify-center">
+          <button
+            onClick={handlePlayPause}
+            className="w-32 h-32 border-4 border-black rounded-full flex items-center justify-center bg-black text-white active:opacity-70"
+          >
             {mediaState.playing ? (
-              <Pause className="w-6 h-6" />
+              <Pause size={64} strokeWidth={2} fill="white" />
             ) : (
-              <Play className="w-6 h-6" />
+              <Play size={64} strokeWidth={2} fill="white" className="ml-2" />
             )}
-          </button>
-          <button onClick={handleSkip} className="btn-secondary p-4" disabled={!hasTrack}>
-            <SkipForward className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Volume */}
-        <div className="card">
-          <div className="flex items-center gap-2 mb-2">
-            <Volume2 className="w-4 h-4" />
-            <div className="text-sm font-medium">Volume: {mediaState.volumePercent}%</div>
+        {/* Skip controls */}
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <button
+            onClick={() => handleSkip('back')}
+            disabled={!hasTrack}
+            className="btn-watch-outline flex-1"
+          >
+            <SkipBack size={32} strokeWidth={2} className="mx-auto" />
+          </button>
+          <button
+            onClick={() => handleSkip('forward')}
+            disabled={!hasTrack}
+            className="btn-watch-outline flex-1"
+          >
+            <SkipForward size={32} strokeWidth={2} className="mx-auto" />
+          </button>
+        </div>
+
+        {/* Volume indicator */}
+        <div className="border-t-2 border-black pt-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="meta-text">VOLUME</div>
+            <div className="text-lg font-bold">{mediaState.volumePercent}%</div>
           </div>
-          <div className="h-2 border border-black mb-2">
+          <div className="h-3 border-2 border-black">
             <div
               className="h-full bg-black transition-all"
               style={{ width: `${mediaState.volumePercent}%` }}
             />
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => handleVolumeChange(-10)} className="btn-secondary flex-1">
-              -10%
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={() => handleVolumeChange(-10)}
+              className="btn-watch-outline flex-1 !min-h-0 !py-2"
+            >
+              -
             </button>
-            <button onClick={() => handleVolumeChange(10)} className="btn-secondary flex-1">
-              +10%
+            <button
+              onClick={() => handleVolumeChange(10)}
+              className="btn-watch-outline flex-1 !min-h-0 !py-2"
+            >
+              +
             </button>
           </div>
         </div>
 
-        {/* Output device */}
-        <div>
-          <div className="text-sm font-medium mb-2">Output Device</div>
-          <div className="grid grid-cols-2 gap-2">
-            {outputDevices.map((device) => {
-              const Icon = getDeviceIcon(device);
-              const isActive = mediaState.outputDevice === device;
-              return (
-                <button
-                  key={device}
-                  onClick={() => handleOutputDevice(device)}
-                  className={`border-2 border-black p-3 flex flex-col items-center gap-1 ${
-                    isActive ? 'bg-black text-white' : 'bg-white'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs capitalize">{device}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </main>
+        {/* Swipe hint */}
+        <div className="gesture-hint gesture-hint-left">SKIP</div>
+        <div className="gesture-hint gesture-hint-right">SKIP</div>
+      </div>
     </div>
   );
 }

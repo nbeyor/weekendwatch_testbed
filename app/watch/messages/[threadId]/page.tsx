@@ -1,20 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { WatchHeader } from '@/components/watch/WatchHeader';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
+import { ArrowLeft, Mic, Send } from 'lucide-react';
 import { messagingService } from '@/services/MessagingService';
 import { useAppStore } from '@/stores/useAppStore';
 import { addToQueue } from '@/lib/db';
 import type { Message, Contact } from '@/models/types';
-import { Loader, Send } from 'lucide-react';
 
 export default function ThreadPage() {
   const params = useParams();
   const router = useRouter();
   const threadId = params.threadId as string;
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [contact, setContact] = useState<Contact | null>(null);
@@ -28,6 +26,11 @@ export default function ThreadPage() {
   useEffect(() => {
     loadMessages();
   }, [threadId]);
+
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const loadMessages = async () => {
     try {
@@ -59,33 +62,24 @@ export default function ThreadPage() {
 
     try {
       if (offlineMode) {
-        // Queue the message
         const queuedMessage = messagingService.queueMessage(threadId, newMessage);
         await addToQueue({
           type: 'send_message',
-          payload: {
-            threadId,
-            text: newMessage,
-            messageId: queuedMessage.id,
-          },
+          payload: { threadId, text: newMessage, messageId: queuedMessage.id },
           createdAt: new Date(),
           retryCount: 0,
           status: 'pending',
         });
-
         setMessages([...messages, queuedMessage]);
-        addToast('Message queued (offline)', 'info');
+        addToast('Queued (offline)', 'info');
       } else {
-        // Send immediately
         const sent = await messagingService.sendMessage(threadId, newMessage);
         setMessages([...messages, sent]);
-        addToast('Message sent', 'success');
       }
-
       setNewMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
-      addToast('Failed to send message', 'error');
+      addToast('Send failed', 'error');
     } finally {
       setSending(false);
     }
@@ -93,41 +87,50 @@ export default function ThreadPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col h-screen">
-        <WatchHeader title="..." showBack backHref="/watch/messages" />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader className="w-6 h-6 animate-spin" />
+      <div className="watch-container">
+        <div className="watch-mode">
+          <div className="meta-text text-center">LOADING...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <WatchHeader
-        title={contact?.name || 'Unknown'}
-        showBack
-        backHref="/watch/messages"
-      />
+    <div className="watch-container flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b-2 border-black">
+        <button onClick={() => router.push('/watch/comm')}>
+          <ArrowLeft size={24} strokeWidth={2} />
+        </button>
+        <div className="text-lg font-semibold truncate flex-1 mx-3">
+          {contact?.name || 'Unknown'}
+        </div>
+        <button onClick={() => router.push('/watch/voice')}>
+          <Mic size={24} strokeWidth={2} />
+        </button>
+      </div>
 
       {/* Messages area */}
-      <main className="flex-1 overflow-auto p-3 space-y-3">
+      <div className="flex-1 overflow-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${
-              message.sender === 'me' ? 'justify-end' : 'justify-start'
-            }`}
+            className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] border-2 border-black p-2 ${
-                message.sender === 'me' ? 'bg-black text-white' : 'bg-white'
-              }`}
+              className={`max-w-[85%] ${
+                message.sender === 'me'
+                  ? 'bg-black text-white'
+                  : 'border-2 border-black bg-white'
+              } p-3`}
             >
-              <p className="text-sm">{message.text}</p>
+              {/* Message text - larger, more readable */}
+              <p className="text-base leading-relaxed">{message.text}</p>
+
+              {/* Timestamp - subtle */}
               <div
-                className={`text-xs mt-1 ${
-                  message.sender === 'me' ? 'text-gray-light' : 'text-gray-dark'
+                className={`text-xs mt-2 ${
+                  message.sender === 'me' ? 'opacity-60' : 'opacity-40'
                 }`}
               >
                 {message.createdAt.toLocaleTimeString('en-US', {
@@ -135,31 +138,31 @@ export default function ThreadPage() {
                   minute: '2-digit',
                 })}
                 {message.status === 'queued' && ' • Queued'}
-                {message.status === 'failed' && ' • Failed'}
               </div>
             </div>
           </div>
         ))}
-      </main>
+        <div ref={messagesEndRef} />
+      </div>
 
-      {/* Input area */}
-      <div className="border-t-2 border-black p-3">
+      {/* Input area - simplified */}
+      <div className="p-4 border-t-2 border-black">
         <div className="flex gap-2">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Type a message..."
-            className="input flex-1"
+            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+            placeholder="Message..."
+            className="flex-1 px-3 py-3 border-2 border-black text-base"
             disabled={sending}
           />
           <button
             onClick={handleSend}
             disabled={!newMessage.trim() || sending}
-            className="btn-primary px-4"
+            className="btn-circle"
           >
-            {sending ? <Loader className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            <Send size={24} strokeWidth={2} />
           </button>
         </div>
       </div>

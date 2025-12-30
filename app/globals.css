@@ -1,15 +1,26 @@
 @import "tailwindcss";
 
-/* Monochrome e-ink design system */
+/* WeekendWatch - Radically Simple Watch Interface */
 :root {
   --watch-width: 360px;
   --watch-height: 360px;
+
+  /* Typography scale - much larger for watch */
+  --text-xs: 0.75rem;   /* 12px - meta info */
+  --text-sm: 1rem;      /* 16px - secondary */
+  --text-base: 1.5rem;  /* 24px - body */
+  --text-lg: 2rem;      /* 32px - emphasis */
+  --text-xl: 3rem;      /* 48px - primary */
+  --text-2xl: 4rem;     /* 64px - time/numbers */
+  --text-3xl: 6rem;     /* 96px - hero time */
 }
 
 body {
   background-color: white;
   color: black;
   -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Respect reduced motion preferences */
@@ -23,7 +34,58 @@ body {
   }
 }
 
-/* Button variants */
+/* Watch buttons - large, simple tap targets */
+.btn-watch {
+  width: 100%;
+  min-height: 4rem;
+  padding: 1rem;
+  border: 3px solid black;
+  background-color: black;
+  color: white;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  transition: opacity 0.1s;
+}
+
+.btn-watch:active {
+  opacity: 0.7;
+}
+
+.btn-watch-outline {
+  width: 100%;
+  min-height: 4rem;
+  padding: 1rem;
+  border: 3px solid black;
+  background-color: white;
+  color: black;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  transition: opacity 0.1s;
+}
+
+.btn-watch-outline:active {
+  opacity: 0.7;
+}
+
+/* Circle action button */
+.btn-circle {
+  width: 5rem;
+  height: 5rem;
+  border: 3px solid black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  color: white;
+  transition: opacity 0.1s;
+}
+
+.btn-circle:active {
+  opacity: 0.7;
+}
+
+/* Admin/desktop buttons (smaller) */
 .btn {
   min-height: 2.75rem;
   padding: 0.5rem 1rem;
@@ -34,11 +96,6 @@ body {
 
 .btn:active {
   opacity: 0.5;
-}
-
-.btn:disabled {
-  opacity: 0.3;
-  border-style: dashed;
 }
 
 .btn-primary {
@@ -55,11 +112,6 @@ body {
   opacity: 0.5;
 }
 
-.btn-primary:disabled {
-  opacity: 0.3;
-  border-style: dashed;
-}
-
 .btn-secondary {
   background-color: white;
   color: black;
@@ -72,11 +124,6 @@ body {
 
 .btn-secondary:active {
   opacity: 0.5;
-}
-
-.btn-secondary:disabled {
-  opacity: 0.3;
-  border-style: dashed;
 }
 
 /* Input fields */
@@ -125,19 +172,176 @@ body {
   padding: 1rem;
 }
 
-/* Watch viewport constraint */
+/* Watch viewport - full screen modes */
 .watch-container {
-  max-width: 360px;
+  width: 360px;
+  height: 360px;
   margin: 0 auto;
   background-color: white;
-  min-height: 360px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Full-screen mode */
+.watch-mode {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+}
+
+/* Hero time display */
+.time-hero {
+  font-size: var(--text-3xl);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-large {
+  font-size: var(--text-2xl);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Context card - single focus element */
+.context-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+/* Large action text */
+.action-text {
+  font-size: var(--text-xl);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* Meta text */
+.meta-text {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Gesture zone indicators */
+.gesture-hint {
+  position: absolute;
+  font-size: var(--text-xs);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.gesture-hint-top {
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.gesture-hint-bottom {
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.gesture-hint-left {
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.gesture-hint-right {
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
 }
 
 /* Admin container */
 .admin-container {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 2rem;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Admin card with color */
+.admin-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.admin-card-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #0f172a;
+}
+
+/* Admin stats */
+.admin-stat {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.admin-stat-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+/* Admin badges */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.admin-badge-primary {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.admin-badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.admin-badge-warning {
+  background-color: #fed7aa;
+  color: #92400e;
+}
+
+.admin-badge-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 /* Status badge */

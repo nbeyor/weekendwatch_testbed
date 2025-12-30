@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Monochrome palette for e-ink
+        // Monochrome palette for e-ink watch
         black: '#000000',
         white: '#FFFFFF',
         gray: {
@@ -17,6 +17,16 @@ const config: Config = {
           DEFAULT: 'rgba(0, 0, 0, 0.15)',
           medium: 'rgba(0, 0, 0, 0.3)',
           dark: 'rgba(0, 0, 0, 0.5)',
+        },
+        // Admin console colors
+        admin: {
+          primary: '#2563eb',      // Blue
+          secondary: '#7c3aed',    // Purple
+          success: '#059669',      // Green
+          warning: '#d97706',      // Orange
+          danger: '#dc2626',       // Red
+          bg: '#f8fafc',           // Light gray bg
+          border: '#e2e8f0',       // Light border
         }
       },
       fontFamily: {

@@ -1,20 +1,27 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { WatchHeader } from '@/components/watch/WatchHeader';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { useRouter } from 'next/navigation';
+import {
+  ArrowLeft,
+  ArrowUp,
+  ArrowRight as ArrowRightIcon,
+  ArrowDown,
+  MapPin,
+  X,
+} from 'lucide-react';
 import { navService } from '@/services/NavService';
 import type { NavRoute } from '@/models/types';
-import { Navigation, MapPin, ArrowRight } from 'lucide-react';
 
 export default function NavPage() {
+  const router = useRouter();
   const [activeRoute, setActiveRoute] = useState<NavRoute | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   useEffect(() => {
-    setActiveRoute(navService.getActiveRoute());
+    const route = navService.getActiveRoute();
+    setActiveRoute(route);
   }, []);
 
   const handleSearch = async () => {
@@ -33,6 +40,18 @@ export default function NavPage() {
     }
   };
 
+  const handleQuickDest = async (dest: string) => {
+    setSearchQuery(dest);
+    setTimeout(async () => {
+      const results = await navService.searchDestination(dest);
+      if (results.length > 0) {
+        const route = await navService.createRoute(results[0].id);
+        setActiveRoute(route);
+        setCurrentStepIndex(0);
+      }
+    }, 100);
+  };
+
   const handleNextStep = () => {
     if (activeRoute && currentStepIndex < activeRoute.steps.length - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
@@ -45,99 +64,131 @@ export default function NavPage() {
     setCurrentStepIndex(0);
   };
 
+  const getDirectionIcon = (instruction: string) => {
+    const lower = instruction.toLowerCase();
+    if (lower.includes('left')) return ArrowLeft;
+    if (lower.includes('right')) return ArrowRightIcon;
+    if (lower.includes('straight') || lower.includes('continue')) return ArrowUp;
+    return ArrowUp;
+  };
+
   const currentStep = activeRoute?.steps[currentStepIndex];
-  const nextStep = activeRoute?.steps[currentStepIndex + 1];
+  const DirectionIcon = currentStep ? getDirectionIcon(currentStep.instruction) : ArrowUp;
 
-  return (
-    <div className="flex flex-col h-screen">
-      <WatchHeader title="Navigation" showBack backHref="/watch" />
+  // Active navigation view
+  if (activeRoute && currentStep) {
+    const isLastStep = currentStepIndex === activeRoute.steps.length - 1;
 
-      <main className="flex-1 overflow-auto p-3">
-        {!activeRoute ? (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Navigation className="w-5 h-5" />
-              <h2 className="text-lg font-bold">Where to?</h2>
-            </div>
-
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Search destination..."
-                className="input"
-              />
-              <button onClick={handleSearch} className="btn-primary w-full">
-                Search
-              </button>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium mb-2">Recent</h3>
-              <div className="space-y-2">
-                {['Home', 'Office', 'Blue Bottle Coffee'].map((dest) => (
-                  <button
-                    key={dest}
-                    onClick={() => {
-                      setSearchQuery(dest);
-                      setTimeout(handleSearch, 100);
-                    }}
-                    className="w-full border border-black p-2 flex items-center gap-2 hover:bg-hatch-pattern"
-                  >
-                    <MapPin className="w-4 h-4" />
-                    <span className="text-sm">{dest}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="border-2 border-black p-3">
-              <div className="text-xs text-gray-dark mb-1">Destination</div>
-              <div className="font-bold">{activeRoute.destinationLabel}</div>
-              <div className="text-sm text-gray-dark mt-1">
-                {activeRoute.totalDistanceMiles.toFixed(1)} mi • {activeRoute.totalEtaMin} min
-              </div>
-            </div>
-
-            {currentStep && (
-              <div className="card bg-black text-white">
-                <div className="text-xs opacity-70 mb-1">Current Step</div>
-                <div className="font-medium mb-2">{currentStep.instruction}</div>
-                <div className="text-sm">
-                  {currentStep.distance} • ~{currentStep.etaMin} min
-                </div>
-              </div>
-            )}
-
-            {nextStep && (
-              <div className="border border-black p-3">
-                <div className="text-xs text-gray-dark mb-1">Next</div>
-                <div className="text-sm">{nextStep.instruction}</div>
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              {currentStepIndex < activeRoute.steps.length - 1 ? (
-                <button onClick={handleNextStep} className="btn-primary flex-1">
-                  Next Step <ArrowRight className="w-4 h-4 inline ml-1" />
-                </button>
-              ) : (
-                <div className="card w-full text-center">
-                  <div className="font-medium">Arrived!</div>
-                </div>
-              )}
-            </div>
-
-            <button onClick={handleClearRoute} className="btn-secondary w-full">
-              Clear Route
+    return (
+      <div className="watch-container">
+        <div className="watch-mode">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="meta-text">GOOGLE MAPS</div>
+            <button onClick={handleClearRoute}>
+              <X size={24} strokeWidth={2} />
             </button>
           </div>
-        )}
-      </main>
+
+          {/* ETA and Distance */}
+          <div className="text-center mb-6">
+            <div className="time-large">{activeRoute.totalEtaMin} min</div>
+            <div className="meta-text mt-1">
+              {activeRoute.totalDistanceMiles.toFixed(1)} MI • {activeRoute.destinationLabel.toUpperCase()}
+            </div>
+          </div>
+
+          {/* Giant direction arrow */}
+          <div className="flex-1 flex items-center justify-center">
+            <DirectionIcon size={120} strokeWidth={1.5} />
+          </div>
+
+          {/* Current instruction */}
+          <div className="text-center mb-6">
+            <div className="text-2xl font-bold mb-2">{currentStep.distance}</div>
+            <div className="action-text">{currentStep.instruction}</div>
+          </div>
+
+          {/* Next step button or arrival */}
+          {isLastStep ? (
+            <div className="border-2 border-black p-6 text-center">
+              <div className="text-lg font-bold">You've Arrived!</div>
+              <button
+                onClick={handleClearRoute}
+                className="btn-watch mt-4"
+              >
+                DONE
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleNextStep}
+              className="btn-watch"
+            >
+              NEXT STEP
+            </button>
+          )}
+
+          {/* Step indicator */}
+          <div className="meta-text text-center mt-4">
+            STEP {currentStepIndex + 1} OF {activeRoute.steps.length}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Search view
+  return (
+    <div className="watch-container">
+      <div className="watch-mode">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => router.push('/watch')}>
+            <ArrowLeft size={24} strokeWidth={2} />
+          </button>
+          <div className="meta-text">GOOGLE MAPS</div>
+          <div className="w-6" />
+        </div>
+
+        {/* Search */}
+        <div className="mb-6">
+          <div className="action-text text-center mb-4">Where to?</div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            placeholder="Enter destination..."
+            className="w-full px-4 py-4 border-3 border-black text-lg mb-3"
+            autoFocus
+          />
+          <button
+            onClick={handleSearch}
+            disabled={!searchQuery.trim()}
+            className="btn-watch"
+          >
+            START
+          </button>
+        </div>
+
+        {/* Quick destinations */}
+        <div className="flex-1 overflow-auto">
+          <div className="meta-text mb-3">QUICK DESTINATIONS</div>
+          <div className="space-y-2">
+            {['Home', 'Work', 'Gym', 'Coffee Shop'].map((dest) => (
+              <button
+                key={dest}
+                onClick={() => handleQuickDest(dest)}
+                className="w-full border-2 border-black p-4 flex items-center gap-3 active:opacity-50"
+              >
+                <MapPin size={24} strokeWidth={2} />
+                <span className="text-lg font-medium">{dest}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
