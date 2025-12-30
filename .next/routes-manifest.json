@@ -1,0 +1,155 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/watch/messages/[threadId]",
+      "regex": "^/watch/messages/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPthreadId": "nxtPthreadId"
+      },
+      "namedRegex": "^/watch/messages/(?<nxtPthreadId>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/health",
+      "regex": "^/admin/health(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/health(?:/)?$"
+    },
+    {
+      "page": "/admin/integrations",
+      "regex": "^/admin/integrations(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/integrations(?:/)?$"
+    },
+    {
+      "page": "/admin/settings",
+      "regex": "^/admin/settings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/settings(?:/)?$"
+    },
+    {
+      "page": "/watch",
+      "regex": "^/watch(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch(?:/)?$"
+    },
+    {
+      "page": "/watch/calls",
+      "regex": "^/watch/calls(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/calls(?:/)?$"
+    },
+    {
+      "page": "/watch/comm",
+      "regex": "^/watch/comm(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/comm(?:/)?$"
+    },
+    {
+      "page": "/watch/health",
+      "regex": "^/watch/health(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/health(?:/)?$"
+    },
+    {
+      "page": "/watch/media",
+      "regex": "^/watch/media(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/media(?:/)?$"
+    },
+    {
+      "page": "/watch/messages",
+      "regex": "^/watch/messages(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/messages(?:/)?$"
+    },
+    {
+      "page": "/watch/nav",
+      "regex": "^/watch/nav(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/nav(?:/)?$"
+    },
+    {
+      "page": "/watch/pay",
+      "regex": "^/watch/pay(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/pay(?:/)?$"
+    },
+    {
+      "page": "/watch/settings",
+      "regex": "^/watch/settings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/settings(?:/)?$"
+    },
+    {
+      "page": "/watch/voice",
+      "regex": "^/watch/voice(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/watch/voice(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

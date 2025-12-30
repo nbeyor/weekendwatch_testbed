@@ -1,0 +1,232 @@
+@import "tailwindcss";
+
+/* Monochrome e-ink design system */
+:root {
+  --watch-width: 360px;
+  --watch-height: 360px;
+}
+
+body {
+  background-color: white;
+  color: black;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Button variants */
+.btn {
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid black;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.btn:active {
+  opacity: 0.5;
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  border-style: dashed;
+}
+
+.btn-primary {
+  background-color: black;
+  color: white;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid black;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:active {
+  opacity: 0.5;
+}
+
+.btn-primary:disabled {
+  opacity: 0.3;
+  border-style: dashed;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: black;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid black;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.btn-secondary:active {
+  opacity: 0.5;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.3;
+  border-style: dashed;
+}
+
+/* Input fields */
+.input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid black;
+  background-color: white;
+  color: black;
+}
+
+.input:focus {
+  outline: none;
+  border-color: black;
+}
+
+.input:disabled {
+  opacity: 0.3;
+  border-style: dashed;
+}
+
+.input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* List items */
+.list-item {
+  border-bottom: 1px solid black;
+  padding: 0.75rem;
+  min-height: 2.75rem;
+  transition: all 0.2s;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item:active {
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+}
+
+/* Card/Panel */
+.card {
+  border: 2px solid black;
+  padding: 1rem;
+}
+
+/* Watch viewport constraint */
+.watch-container {
+  max-width: 360px;
+  margin: 0 auto;
+  background-color: white;
+  min-height: 360px;
+}
+
+/* Admin container */
+.admin-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Status badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid black;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Segmented control */
+.segmented-control {
+  display: inline-flex;
+  border: 2px solid black;
+}
+
+.segmented-control-item {
+  padding: 0.5rem 1rem;
+  border-right: 2px solid black;
+  transition: all 0.2s;
+}
+
+.segmented-control-item:last-child {
+  border-right: none;
+}
+
+.segmented-control-item.active {
+  background-color: black;
+  color: white;
+}
+
+/* Modal/Sheet */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: white;
+  z-index: 50;
+}
+
+/* Bezel frame mode */
+.watch-bezel {
+  position: relative;
+  margin: 0 auto;
+  width: 380px;
+  height: 400px;
+}
+
+.watch-bezel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 8px solid black;
+  pointer-events: none;
+  border-radius: 50px;
+}
+
+.watch-bezel-screen {
+  position: absolute;
+  top: 20px;
+  left: 10px;
+  width: 360px;
+  height: 360px;
+  overflow: hidden;
+}
+
+/* Tap target minimum size */
+.tap-target {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+/* Truncate text utilities */
+.truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Hatch pattern background */
+.bg-hatch-pattern {
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+}

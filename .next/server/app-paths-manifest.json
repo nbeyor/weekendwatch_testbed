@@ -1,0 +1,20 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/health/page": "app/admin/health/page.js",
+  "/admin/integrations/page": "app/admin/integrations/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/settings/page": "app/admin/settings/page.js",
+  "/page": "app/page.js",
+  "/watch/calls/page": "app/watch/calls/page.js",
+  "/watch/comm/page": "app/watch/comm/page.js",
+  "/watch/health/page": "app/watch/health/page.js",
+  "/watch/media/page": "app/watch/media/page.js",
+  "/watch/messages/[threadId]/page": "app/watch/messages/[threadId]/page.js",
+  "/watch/messages/page": "app/watch/messages/page.js",
+  "/watch/nav/page": "app/watch/nav/page.js",
+  "/watch/page": "app/watch/page.js",
+  "/watch/pay/page": "app/watch/pay/page.js",
+  "/watch/settings/page": "app/watch/settings/page.js",
+  "/watch/voice/page": "app/watch/voice/page.js"
+}
