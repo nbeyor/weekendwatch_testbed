@@ -27,11 +27,7 @@ export class MockVoiceCommandService implements VoiceCommandService {
       return this.parseNavigationCommand(text, lowerText);
     }
 
-    // Media patterns
-    if (this.containsAny(lowerText, ['play', 'music', 'spotify', 'song'])) {
-      return this.parseMediaPlayCommand(text, lowerText);
-    }
-
+    // Media patterns - check specific actions before general play
     if (this.containsAny(lowerText, ['pause', 'stop'])) {
       return {
         intent: 'MEDIA_PAUSE',
@@ -48,6 +44,10 @@ export class MockVoiceCommandService implements VoiceCommandService {
         params: {},
         rawText: text,
       };
+    }
+
+    if (this.containsAny(lowerText, ['play', 'music', 'spotify', 'song'])) {
+      return this.parseMediaPlayCommand(text, lowerText);
     }
 
     if (this.containsAny(lowerText, ['volume'])) {
@@ -96,16 +96,25 @@ export class MockVoiceCommandService implements VoiceCommandService {
     let messageText: string | undefined;
     let contactId: string | undefined;
 
-    // Find contact mention
+    // Find contact mention (check both full name and first name)
     for (const contact of contacts) {
       const nameLower = contact.name.toLowerCase();
+      const firstNameLower = contact.name.split(' ')[0].toLowerCase();
+
+      let matchedName = '';
       if (lowerText.includes(nameLower)) {
+        matchedName = nameLower;
+      } else if (lowerText.includes(firstNameLower)) {
+        matchedName = firstNameLower;
+      }
+
+      if (matchedName) {
         contactName = contact.name;
         contactId = contact.id;
 
         // Extract message after contact name
         const afterContact = text.substring(
-          lowerText.indexOf(nameLower) + nameLower.length
+          lowerText.indexOf(matchedName) + matchedName.length
         ).trim();
 
         // Remove common connectors
@@ -147,10 +156,12 @@ export class MockVoiceCommandService implements VoiceCommandService {
 
     const contacts = await messagingService.getContacts();
 
-    // Find contact mention
+    // Find contact mention (check both full name and first name)
     for (const contact of contacts) {
       const nameLower = contact.name.toLowerCase();
-      if (lowerText.includes(nameLower)) {
+      const firstNameLower = contact.name.split(' ')[0].toLowerCase();
+
+      if (lowerText.includes(nameLower) || lowerText.includes(firstNameLower)) {
         return {
           intent: 'CALL',
           confidence: 0.95,
