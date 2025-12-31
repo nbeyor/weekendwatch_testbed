@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Mic, Send } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Mic, Send } from 'lucide-react';
 import { messagingService } from '@/services/MessagingService';
 import { useAppStore } from '@/stores/useAppStore';
 import { addToQueue } from '@/lib/db';
@@ -85,6 +85,12 @@ export default function ThreadPage() {
     }
   };
 
+  const formatTime = (date: Date) =>
+    date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+
   if (loading) {
     return (
       <div className="watch-container">
@@ -111,37 +117,48 @@ export default function ThreadPage() {
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[85%] ${
-                message.sender === 'me'
-                  ? 'bg-black text-white'
-                  : 'border-2 border-black bg-white'
-              } p-3`}
-            >
-              {/* Message text - larger, more readable */}
-              <p className="text-base leading-relaxed">{message.text}</p>
+      <div className="flex-1 overflow-auto px-4">
+        {messages.length === 0 ? (
+          <div className="py-6 text-center text-gray-dark">
+            <div className="text-sm">No messages yet</div>
+          </div>
+        ) : null}
 
-              {/* Timestamp - subtle */}
-              <div
-                className={`text-xs mt-2 ${
-                  message.sender === 'me' ? 'opacity-60' : 'opacity-40'
-                }`}
-              >
-                {message.createdAt.toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                })}
-                {message.status === 'queued' && ' • Queued'}
+        {messages.map((message) => {
+          const isOutbound = message.sender === 'me';
+
+          return (
+            <div
+              key={message.id}
+              className="border-b border-black/15 py-3"
+            >
+              <div className="flex items-start gap-3">
+                {/* Outbound indicator (left) */}
+                <div className="w-6 flex-shrink-0 pt-1">
+                  {isOutbound ? (
+                    <ChevronLeft className="w-5 h-5 opacity-60" />
+                  ) : null}
+                </div>
+
+                {/* Message text (flat, no bubble) */}
+                <div className="min-w-0 flex-1">
+                  <div className="text-lg leading-snug break-words">{message.text}</div>
+                  <div className="text-xs opacity-50 mt-1">
+                    {formatTime(message.createdAt)}
+                    {message.status === 'queued' ? ' • Queued' : ''}
+                  </div>
+                </div>
+
+                {/* Inbound indicator (right) */}
+                <div className="w-6 flex-shrink-0 pt-1 flex justify-end">
+                  {!isOutbound ? (
+                    <ChevronRight className="w-5 h-5 opacity-60" />
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
 
