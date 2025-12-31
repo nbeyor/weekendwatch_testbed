@@ -142,55 +142,24 @@ export default function NavPage() {
   return (
     <div className="watch-container">
       <div className="watch-mode">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-3">
-          <button onClick={() => router.push('/watch')}>
+        {/* Header with buttons */}
+        <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
+          <button onClick={() => router.push('/watch')} className="flex items-center gap-1">
             <ArrowLeft size={16} strokeWidth={2} />
           </button>
-          <div className="meta-text">GOOGLE MAPS</div>
-          <div className="w-4" />
-        </div>
-
-        {/* Voice prompt */}
-        <div className="text-center mb-3 pb-2 border-b-2 border-black">
-          <div className="text-xl font-bold mb-1">Where to?</div>
-          <div className="text-sm opacity-60">Say "navigate to [place]"</div>
-        </div>
-
-        {/* Search */}
-        <div className="mb-3">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Enter destination..."
-            className="w-full px-2 py-2 border-2 border-black text-base mb-2"
-            autoFocus
-          />
-          <button
-            onClick={handleSearch}
-            disabled={!searchQuery.trim()}
-            className="btn-watch"
-          >
-            START
+          <button className="btn-watch-outline !min-h-0 !py-1 px-2 text-xs flex-1 mr-1">
+            RECENTS
+          </button>
+          <button className="btn-watch-outline !min-h-0 !py-1 px-2 text-xs flex-1">
+            FAVORITES
           </button>
         </div>
 
-        {/* Quick destinations */}
-        <div className="flex-1 overflow-auto">
-          <div className="meta-text mb-2">QUICK DESTINATIONS</div>
-          <div className="space-y-1">
-            {['Home', 'Work', 'Gym', 'Coffee Shop'].map((dest) => (
-              <button
-                key={dest}
-                onClick={() => handleQuickDest(dest)}
-                className="w-full border-2 border-black p-2 flex items-center gap-2 active:opacity-50"
-              >
-                <MapPin size={16} strokeWidth={2} />
-                <span className="text-base font-medium">{dest}</span>
-              </button>
-            ))}
+        {/* CLI cursor */}
+        <div className="flex-1 p-2">
+          <div className="flex items-center">
+            <span className="text-base">&gt;</span>
+            <span className="cli-cursor"></span>
           </div>
         </div>
       </div>

@@ -51,67 +51,43 @@ export default function CommHubPage() {
     <div className="watch-container">
       <div className="watch-mode">
         {/* Header */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
           <button
             onClick={() => router.push('/watch')}
             className="flex items-center gap-1"
           >
             <ArrowLeft size={16} strokeWidth={2} />
           </button>
-          <div className="meta-text">WHATSAPP</div>
+          <div className="meta-text">MESSAGES</div>
           <div className="w-4" />
         </div>
 
-        {/* Voice prompt */}
-        <div className="text-center mb-2 pb-2 border-b-2 border-black">
-          <div className="text-lg font-semibold mb-1">Recent Conversations</div>
-          <div className="text-sm opacity-60">Say "message [name]"</div>
-        </div>
-
         {/* Conversations list */}
-        <div className="flex-1 overflow-auto -mx-6 px-6 mt-2">
+        <div className="flex-1 overflow-auto">
           {loading ? (
             <div className="text-center mt-12">
               <div className="meta-text">LOADING...</div>
             </div>
           ) : (
-            <div className="space-y-1">
+            <>
               {threads.map((thread) => {
                 const contactId = thread.participantIds.find((id) => id !== 'me');
                 const contact = contacts.find((c) => c.id === contactId);
-                const lastMsg = messages.get(thread.id);
 
                 return (
                   <button
                     key={thread.id}
                     onClick={() => router.push(`/watch/messages/${thread.id}`)}
-                    className="w-full text-left border-b-2 border-black py-2 active:opacity-50"
+                    className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
                   >
-                    {/* Contact name - large */}
-                    <div className="text-lg font-semibold mb-0.5">
-                      {contact?.name || 'Unknown'}
-                    </div>
-
-                    {/* Last message preview */}
-                    <div className="flex items-baseline justify-between gap-1">
-                      <div className="text-base opacity-60 truncate flex-1">
-                        {lastMsg?.text || 'No messages'}
-                      </div>
-                      <div className="meta-text whitespace-nowrap">
-                        {formatTime(thread.lastMessageAt)}
-                      </div>
-                    </div>
+                    <div className="text-base">{contact?.name || 'Unknown'}</div>
                   </button>
                 );
               })}
-            </div>
+            </>
           )}
         </div>
 
-        {/* Voice hint */}
-        <div className="gesture-hint gesture-hint-bottom">
-          PRESS BUTTON TO SPEAK
-        </div>
       </div>
     </div>
   );

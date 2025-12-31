@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronLeft, ChevronRight, Mic, Send } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Mic, Send, Phone } from 'lucide-react';
 import { messagingService } from '@/services/MessagingService';
 import { useAppStore } from '@/stores/useAppStore';
 import { addToQueue } from '@/lib/db';
@@ -101,9 +101,11 @@ export default function ThreadPage() {
     );
   }
 
+  const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+
   return (
     <div className="watch-container flex flex-col">
-      {/* Header */}
+      {/* Header with last message as topic */}
       <div className="p-2 border-b-2 border-black">
         <div className="flex items-center justify-between mb-1">
           <button onClick={() => router.push('/watch/comm')}>
@@ -114,77 +116,31 @@ export default function ThreadPage() {
           </div>
           <div className="w-4" />
         </div>
-        <div className="text-xs text-center opacity-60">
-          Say "message {contact?.name?.split(' ')[0] || 'them'}, [your message]"
-        </div>
-      </div>
-
-      {/* Messages area */}
-      <div className="flex-1 overflow-auto px-2">
-        {messages.length === 0 ? (
-          <div className="py-4 text-center text-gray-dark">
-            <div className="text-sm">No messages yet</div>
+        {lastMessage && (
+          <div className="text-xs opacity-60 truncate">
+            {lastMessage.text}
           </div>
-        ) : null}
-
-        {messages.map((message) => {
-          const isOutbound = message.sender === 'me';
-
-          return (
-            <div
-              key={message.id}
-              className="border-b border-black/15 py-2"
-            >
-              <div className="flex items-start gap-1.5">
-                {/* Outbound indicator (left) */}
-                <div className="w-4 flex-shrink-0 pt-0.5">
-                  {isOutbound ? (
-                    <ChevronLeft className="w-3 h-3 opacity-60" />
-                  ) : null}
-                </div>
-
-                {/* Message text (flat, no bubble) */}
-                <div className="min-w-0 flex-1">
-                  <div className="text-base leading-snug break-words">{message.text}</div>
-                  <div className="text-xs opacity-50 mt-0.5">
-                    {formatTime(message.createdAt)}
-                    {message.status === 'queued' ? ' • Queued' : ''}
-                  </div>
-                </div>
-
-                {/* Inbound indicator (right) */}
-                <div className="w-4 flex-shrink-0 pt-0.5 flex justify-end">
-                  {!isOutbound ? (
-                    <ChevronRight className="w-3 h-3 opacity-60" />
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
+        )}
       </div>
 
-      {/* Input area - simplified */}
-      <div className="p-2 border-t-2 border-black">
-        <div className="flex gap-1">
-          <input
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-            placeholder="Message..."
-            className="flex-1 px-2 py-2 border-2 border-black text-sm"
-            disabled={sending}
-          />
-          <button
-            onClick={handleSend}
-            disabled={!newMessage.trim() || sending}
-            className="btn-circle"
-          >
-            <Send size={16} strokeWidth={2} />
-          </button>
+      {/* CLI cursor area */}
+      <div className="flex-1 p-2">
+        <div className="flex items-center">
+          <span className="text-base">&gt;</span>
+          <span className="cli-cursor"></span>
         </div>
+      </div>
+
+      {/* Bottom buttons */}
+      <div className="p-2 border-t-2 border-black flex gap-2">
+        <button className="btn-watch flex-1 flex items-center justify-center gap-2">
+          <Send size={16} strokeWidth={2} />
+          SEND
+        </button>
+        <button className="btn-watch flex-1 flex items-center justify-center gap-2">
+          <Phone size={16} strokeWidth={2} />
+          CALL
+        </button>
       </div>
     </div>
   );

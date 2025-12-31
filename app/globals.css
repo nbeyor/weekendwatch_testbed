@@ -19,6 +19,7 @@
 body {
   background-color: white;
   color: black;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -434,4 +435,19 @@ body {
 /* Hatch pattern background */
 .bg-hatch-pattern {
   background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+}
+
+/* CLI cursor animation */
+.cli-cursor {
+  display: inline-block;
+  width: 0.5rem;
+  height: 1rem;
+  background-color: black;
+  margin-left: 0.25rem;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }

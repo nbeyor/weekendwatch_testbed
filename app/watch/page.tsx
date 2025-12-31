@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowUp, ArrowRight as ArrowRightIcon, MapPin, Play, Pause, SkipForward, Volume2, Settings as SettingsIcon, X } from 'lucide-react';
+import { ArrowLeft, ArrowUp, ArrowRight as ArrowRightIcon, MapPin, Play, Pause, SkipForward, Volume2, Settings as SettingsIcon, X, Disc3, Phone, Star, Clock } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { messagingService } from '@/services/MessagingService';
 import { mediaService } from '@/services/MediaService';
@@ -146,19 +146,15 @@ export default function WatchHomePage() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="meta-text text-center mb-4">{formatDate()}</div>
+      <div className="meta-text text-center mb-2">{formatDate()}</div>
       <div className="flex-1 flex items-center justify-center">
         <div className="time-hero">{formatTime()}</div>
       </div>
 
-      {/* Voice command suggestions */}
-      <div className="border-t-2 border-black pt-4">
-        <div className="meta-text mb-3 text-center">PRESS BUTTON TO SPEAK</div>
-        <div className="space-y-2 text-center">
-          <div className="text-base opacity-70">"Message Sarah"</div>
-          <div className="text-base opacity-70">"Navigate home"</div>
-          <div className="text-base opacity-70">"Play music"</div>
-        </div>
+      {/* Now Playing */}
+      <div className="border-t-2 border-black pt-2 flex items-center gap-2">
+        <Disc3 size={20} strokeWidth={2} />
+        <div className="text-base truncate flex-1">MOP - Ante Up</div>
       </div>
 
       <div className="gesture-hint gesture-hint-bottom">SWIPE FOR MORE</div>
@@ -171,48 +167,29 @@ export default function WatchHomePage() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
         <button onClick={() => setMode('time')}>
           <ArrowLeft size={16} strokeWidth={2} />
         </button>
-        <div className="meta-text">WHATSAPP</div>
-        <div className="w-6" />
+        <div className="meta-text">MESSAGES</div>
+        <div className="w-4" />
       </div>
 
-      {/* Voice prompt */}
-      <div className="text-center mb-4 pb-4 border-b-2 border-black">
-        <div className="text-lg font-semibold mb-2">Recent Conversations</div>
-        <div className="text-sm opacity-60">Say "message [name]"</div>
-      </div>
+      <div className="flex-1 overflow-auto">
+        {threads.map((thread) => {
+          const contactId = thread.participantIds.find((id) => id !== 'me');
+          const contact = contacts.find((c) => c.id === contactId);
 
-      <div className="flex-1 overflow-auto -mx-6 px-6">
-        <div className="space-y-1">
-          {threads.slice(0, 4).map((thread) => {
-            const contactId = thread.participantIds.find((id) => id !== 'me');
-            const contact = contacts.find((c) => c.id === contactId);
-            const lastMsg = threadMessages.get(thread.id);
-
-            return (
-              <button
-                key={thread.id}
-                onClick={() => router.push(`/watch/messages/${thread.id}`)}
-                className="w-full text-left border-b border-black/20 py-3 active:opacity-50"
-              >
-                <div className="text-lg font-semibold mb-1">
-                  {contact?.name || 'Unknown'}
-                </div>
-                <div className="flex items-baseline justify-between gap-2">
-                  <div className="text-sm opacity-60 truncate flex-1">
-                    {lastMsg?.text || 'No messages'}
-                  </div>
-                  <div className="text-xs opacity-40 whitespace-nowrap">
-                    {formatThreadTime(thread.lastMessageAt)}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+          return (
+            <button
+              key={thread.id}
+              onClick={() => router.push(`/watch/messages/${thread.id}`)}
+              className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
+            >
+              <div className="text-base">{contact?.name || 'Unknown'}</div>
+            </button>
+          );
+        })}
       </div>
 
       <div className="gesture-hint gesture-hint-left">SWIPE</div>
@@ -430,26 +407,23 @@ export default function WatchHomePage() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
         <button onClick={() => setMode('time')}>
           <ArrowLeft size={16} strokeWidth={2} />
         </button>
         <div className="meta-text">SETTINGS</div>
-        <div className="w-6" />
+        <button onClick={() => router.push('/watch/settings')}>
+          <SettingsIcon size={16} strokeWidth={2} />
+        </button>
       </div>
 
-      <div className="context-card">
-        <SettingsIcon size={48} strokeWidth={1.5} />
-        <div className="action-text mt-3">Settings</div>
-        <div className="text-sm opacity-60 mt-1">Customize your watch</div>
+      {/* CLI cursor */}
+      <div className="flex-1 p-2">
+        <div className="flex items-center">
+          <span className="text-base">&gt;</span>
+          <span className="cli-cursor"></span>
+        </div>
       </div>
-
-      <button
-        className="btn-watch"
-        onClick={() => router.push('/watch/settings')}
-      >
-        OPEN
-      </button>
 
       <div className="gesture-hint gesture-hint-left">SWIPE</div>
       <div className="gesture-hint gesture-hint-right">SWIPE</div>
