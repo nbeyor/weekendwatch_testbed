@@ -13,6 +13,9 @@ export default function MediaPage() {
   const [mediaState, setMediaState] = useState<MediaState | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [category, setCategory] = useState<MediaCategory>('main');
+  const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
+  const [selectedPodcast, setSelectedPodcast] = useState<string | null>(null);
+  const [selectedRadio, setSelectedRadio] = useState<string | null>(null);
 
   useEffect(() => {
     loadMediaState();
@@ -94,6 +97,27 @@ export default function MediaPage() {
   const podcasts = ['Joe Rogan Experience', 'The Daily', 'SmartLess', 'Crime Junkie'];
   const radioStations = ['Hip Hop', 'Rock', 'Jazz', 'Electronic'];
 
+  const playlistSongs: Record<string, string[]> = {
+    'Workout Mix': ['Eye of the Tiger', 'Lose Yourself', 'Stronger', 'Till I Collapse'],
+    'Chill Vibes': ['Sunflower', 'Electric Feel', 'Feel Good Inc', 'Float On'],
+    'Study Focus': ['Weightless', 'Breathe Me', 'Pure Shores', 'Teardrop'],
+    'Party Hits': ['Uptown Funk', 'Get Lucky', 'Shut Up and Dance', 'Can\'t Stop the Feeling'],
+  };
+
+  const podcastEpisodes: Record<string, string[]> = {
+    'Joe Rogan Experience': ['#2091 - Elon Musk', '#2090 - Mike Tyson', '#2089 - Duncan Trussell'],
+    'The Daily': ['The Sunday Read', 'A New Trump Era Begins', 'What Comes Next'],
+    'SmartLess': ['Will Ferrell', 'Ryan Reynolds', 'Conan O\'Brien'],
+    'Crime Junkie': ['MURDERED: Sheree Magaro', 'MISSING: Asha Degree', 'CONSPIRACY: The Dyatlov Pass'],
+  };
+
+  const radioSongs: Record<string, string[]> = {
+    'Hip Hop': ['MOP - Ante Up', 'DMX - X Gon Give It To Ya', 'Wu-Tang - C.R.E.A.M.'],
+    'Rock': ['AC/DC - Back in Black', 'Led Zeppelin - Stairway', 'Queen - Bohemian Rhapsody'],
+    'Jazz': ['Miles Davis - So What', 'John Coltrane - Giant Steps', 'Bill Evans - Waltz for Debby'],
+    'Electronic': ['Daft Punk - One More Time', 'Deadmau5 - Strobe', 'Calvin Harris - Feel So Close'],
+  };
+
   // Main view
   if (category === 'main') {
     return (
@@ -122,19 +146,10 @@ export default function MediaPage() {
           </div>
 
           {/* Now Playing */}
-          <div className="border-t border-b border-black/20 py-2 mb-2">
-            <div className="text-xs opacity-60 mb-1">NOW PLAYING</div>
+          <div className="flex-1 flex items-center justify-center">
             <div className="flex items-center gap-2">
-              <Disc3 size={16} strokeWidth={2} />
-              <div className="text-sm truncate flex-1">MOP - Ante Up</div>
-            </div>
-          </div>
-
-          {/* CLI cursor */}
-          <div className="flex-1 p-2">
-            <div className="flex items-center">
-              <span className="text-base">&gt;</span>
-              <span className="cli-cursor"></span>
+              <Disc3 size={24} strokeWidth={2} />
+              <div className="text-base font-medium">MOP - Ante Up</div>
             </div>
           </div>
         </div>
@@ -142,34 +157,169 @@ export default function MediaPage() {
     );
   }
 
-  // List views
-  const items = category === 'playlists' ? playlists : category === 'podcasts' ? podcasts : radioStations;
-  const title = category === 'playlists' ? 'PLAYLISTS' : category === 'podcasts' ? 'PODCASTS' : 'RADIO';
-
-  return (
-    <div className="watch-container">
-      <div className="watch-mode">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
-          <button onClick={() => setCategory('main')}>
-            <ArrowLeft size={16} strokeWidth={2} />
-          </button>
-          <div className="meta-text">{title}</div>
-          <div className="w-4" />
-        </div>
-
-        {/* List */}
-        <div className="flex-1 overflow-auto">
-          {items.map((item) => (
-            <button
-              key={item}
-              className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
-            >
-              <div className="text-sm">{item}</div>
+  // Show songs/episodes for a specific playlist/podcast/radio
+  if (selectedPlaylist) {
+    const songs = playlistSongs[selectedPlaylist] || [];
+    return (
+      <div className="watch-container">
+        <div className="watch-mode">
+          <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
+            <button onClick={() => setSelectedPlaylist(null)}>
+              <ArrowLeft size={16} strokeWidth={2} />
             </button>
-          ))}
+            <div className="meta-text truncate flex-1 mx-2">{selectedPlaylist.toUpperCase()}</div>
+            <div className="w-4" />
+          </div>
+          <div className="flex-1 overflow-auto">
+            {songs.map((song) => (
+              <button
+                key={song}
+                className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
+              >
+                <div className="text-sm">{song}</div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (selectedPodcast) {
+    const episodes = podcastEpisodes[selectedPodcast] || [];
+    return (
+      <div className="watch-container">
+        <div className="watch-mode">
+          <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
+            <button onClick={() => setSelectedPodcast(null)}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </button>
+            <div className="meta-text truncate flex-1 mx-2">{selectedPodcast.toUpperCase()}</div>
+            <div className="w-4" />
+          </div>
+          <div className="flex-1 overflow-auto">
+            {episodes.map((episode) => (
+              <button
+                key={episode}
+                className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
+              >
+                <div className="text-sm">{episode}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedRadio) {
+    const songs = radioSongs[selectedRadio] || [];
+    return (
+      <div className="watch-container">
+        <div className="watch-mode">
+          <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
+            <button onClick={() => setSelectedRadio(null)}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </button>
+            <div className="meta-text truncate flex-1 mx-2">{selectedRadio.toUpperCase()}</div>
+            <div className="w-4" />
+          </div>
+          <div className="flex-1 overflow-auto">
+            {songs.map((song) => (
+              <button
+                key={song}
+                className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
+              >
+                <div className="text-sm">{song}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Category list views
+  if (category === 'playlists') {
+    return (
+      <div className="watch-container">
+        <div className="watch-mode">
+          <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
+            <button onClick={() => setCategory('main')}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </button>
+            <div className="meta-text">PLAYLISTS</div>
+            <div className="w-4" />
+          </div>
+          <div className="flex-1 overflow-auto">
+            {playlists.map((playlist) => (
+              <button
+                key={playlist}
+                onClick={() => setSelectedPlaylist(playlist)}
+                className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
+              >
+                <div className="text-sm">{playlist}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (category === 'podcasts') {
+    return (
+      <div className="watch-container">
+        <div className="watch-mode">
+          <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
+            <button onClick={() => setCategory('main')}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </button>
+            <div className="meta-text">PODCASTS</div>
+            <div className="w-4" />
+          </div>
+          <div className="flex-1 overflow-auto">
+            {podcasts.map((podcast) => (
+              <button
+                key={podcast}
+                onClick={() => setSelectedPodcast(podcast)}
+                className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
+              >
+                <div className="text-sm">{podcast}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (category === 'radio') {
+    return (
+      <div className="watch-container">
+        <div className="watch-mode">
+          <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-black">
+            <button onClick={() => setCategory('main')}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </button>
+            <div className="meta-text">RADIO</div>
+            <div className="w-4" />
+          </div>
+          <div className="flex-1 overflow-auto">
+            {radioStations.map((station) => (
+              <button
+                key={station}
+                onClick={() => setSelectedRadio(station)}
+                className="w-full text-left border-b border-black/20 py-2 active:opacity-50"
+              >
+                <div className="text-sm">{station}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 }
