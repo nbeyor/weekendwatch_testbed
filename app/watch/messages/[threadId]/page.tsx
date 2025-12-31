@@ -104,16 +104,19 @@ export default function ThreadPage() {
   return (
     <div className="watch-container flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b-2 border-black">
-        <button onClick={() => router.push('/watch/comm')}>
-          <ArrowLeft size={24} strokeWidth={2} />
-        </button>
-        <div className="text-lg font-semibold truncate flex-1 mx-3">
-          {contact?.name || 'Unknown'}
+      <div className="p-4 border-b-2 border-black">
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={() => router.push('/watch/comm')}>
+            <ArrowLeft size={24} strokeWidth={2} />
+          </button>
+          <div className="text-lg font-semibold truncate flex-1 mx-3">
+            {contact?.name || 'Unknown'}
+          </div>
+          <div className="w-6" />
         </div>
-        <button onClick={() => router.push('/watch/voice')}>
-          <Mic size={24} strokeWidth={2} />
-        </button>
+        <div className="text-xs text-center opacity-60">
+          Say "message {contact?.name?.split(' ')[0] || 'them'}, [your message]"
+        </div>
       </div>
 
       {/* Messages area */}

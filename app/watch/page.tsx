@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowUp, ArrowRight as ArrowRightIcon, Mic, MapPin, Play, Pause, SkipForward, Volume2, Settings as SettingsIcon, X } from 'lucide-react';
+import { ArrowLeft, ArrowUp, ArrowRight as ArrowRightIcon, MapPin, Play, Pause, SkipForward, Volume2, Settings as SettingsIcon, X } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { messagingService } from '@/services/MessagingService';
 import { mediaService } from '@/services/MediaService';
@@ -150,16 +150,17 @@ export default function WatchHomePage() {
       <div className="flex-1 flex items-center justify-center">
         <div className="time-hero">{formatTime()}</div>
       </div>
-      {latestMessage && !weekendMode && (
-        <div
-          className="border-t-2 border-black pt-4 cursor-pointer"
-          onClick={() => setMode('chat')}
-        >
-          <div className="meta-text mb-2">LATEST MESSAGE</div>
-          <div className="text-lg font-medium truncate">{latestMessage.sender}</div>
-          <div className="text-base opacity-60 truncate">{latestMessage.text}</div>
+
+      {/* Voice command suggestions */}
+      <div className="border-t-2 border-black pt-4">
+        <div className="meta-text mb-3 text-center">PRESS BUTTON TO SPEAK</div>
+        <div className="space-y-2 text-center">
+          <div className="text-base opacity-70">"Message Sarah"</div>
+          <div className="text-base opacity-70">"Navigate home"</div>
+          <div className="text-base opacity-70">"Play music"</div>
         </div>
-      )}
+      </div>
+
       <div className="gesture-hint gesture-hint-bottom">SWIPE FOR MORE</div>
     </div>
   );
@@ -175,14 +176,18 @@ export default function WatchHomePage() {
           <ArrowLeft size={24} strokeWidth={2} />
         </button>
         <div className="meta-text">WHATSAPP</div>
-        <button onClick={() => router.push('/watch/voice')}>
-          <Mic size={24} strokeWidth={2} />
-        </button>
+        <div className="w-6" />
+      </div>
+
+      {/* Voice prompt */}
+      <div className="text-center mb-4 pb-4 border-b-2 border-black">
+        <div className="text-lg font-semibold mb-2">Recent Conversations</div>
+        <div className="text-sm opacity-60">Say "message [name]"</div>
       </div>
 
       <div className="flex-1 overflow-auto -mx-6 px-6">
         <div className="space-y-1">
-          {threads.map((thread) => {
+          {threads.slice(0, 4).map((thread) => {
             const contactId = thread.participantIds.find((id) => id !== 'me');
             const contact = contacts.find((c) => c.id === contactId);
             const lastMsg = threadMessages.get(thread.id);
@@ -191,16 +196,16 @@ export default function WatchHomePage() {
               <button
                 key={thread.id}
                 onClick={() => router.push(`/watch/messages/${thread.id}`)}
-                className="w-full text-left border-b-2 border-black py-4 active:opacity-50"
+                className="w-full text-left border-b border-black/20 py-3 active:opacity-50"
               >
                 <div className="text-lg font-semibold mb-1">
                   {contact?.name || 'Unknown'}
                 </div>
                 <div className="flex items-baseline justify-between gap-2">
-                  <div className="text-base opacity-60 truncate flex-1">
+                  <div className="text-sm opacity-60 truncate flex-1">
                     {lastMsg?.text || 'No messages'}
                   </div>
-                  <div className="meta-text whitespace-nowrap">
+                  <div className="text-xs opacity-40 whitespace-nowrap">
                     {formatThreadTime(thread.lastMessageAt)}
                   </div>
                 </div>
@@ -232,29 +237,27 @@ export default function WatchHomePage() {
       await mediaService.skip();
     };
 
-    const handleVolumeChange = async (delta: number) => {
-      const newVolume = Math.max(0, Math.min(100, mediaState.volumePercent + delta));
-      await mediaService.setVolume(newVolume);
-    };
-
     return (
       <div
         className="watch-mode"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <button onClick={() => setMode('time')}>
             <ArrowLeft size={24} strokeWidth={2} />
           </button>
           <div className="meta-text">SPOTIFY</div>
-          <button onClick={() => handleVolumeChange(mediaState.volumePercent > 0 ? -100 : 50)}>
-            <Volume2 size={24} strokeWidth={2} />
-          </button>
+          <div className="w-6" />
         </div>
 
-        <div className="text-center mb-6">
-          <div className="text-lg font-bold mb-2 truncate">
+        {/* Voice commands */}
+        <div className="text-center mb-4 pb-3 border-b border-black/20">
+          <div className="text-sm opacity-60">Say "play", "pause", "next song"</div>
+        </div>
+
+        <div className="text-center mb-4">
+          <div className="text-xl font-bold mb-1 truncate">
             {hasTrack ? mediaState.trackTitle : 'Not Playing'}
           </div>
           {hasTrack && (
@@ -393,19 +396,10 @@ export default function WatchHomePage() {
           <div className="w-6" />
         </div>
 
-        <div className="mb-6">
-          <div className="action-text text-center mb-4">Where to?</div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Enter destination..."
-            className="w-full px-4 py-4 border-3 border-black text-lg mb-3"
-          />
-          <button onClick={handleSearch} disabled={!searchQuery.trim()} className="btn-watch">
-            START
-          </button>
+        {/* Voice prompt */}
+        <div className="text-center mb-6 pb-4 border-b-2 border-black">
+          <div className="text-xl font-bold mb-2">Where to?</div>
+          <div className="text-sm opacity-60">Say "navigate to [place]"</div>
         </div>
 
         <div className="flex-1 overflow-auto -mx-6 px-6">
@@ -415,10 +409,10 @@ export default function WatchHomePage() {
               <button
                 key={dest}
                 onClick={() => handleQuickDest(dest)}
-                className="w-full border-2 border-black p-4 flex items-center gap-3 active:opacity-50"
+                className="w-full border-2 border-black p-3 flex items-center gap-3 active:opacity-50"
               >
-                <MapPin size={24} strokeWidth={2} />
-                <span className="text-lg font-medium">{dest}</span>
+                <MapPin size={20} strokeWidth={2} />
+                <span className="text-base font-medium">{dest}</span>
               </button>
             ))}
           </div>
