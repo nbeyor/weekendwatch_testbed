@@ -97,18 +97,17 @@ export default function MediaPage() {
         onTouchEnd={handleTouchEnd}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <button onClick={() => router.push('/watch')}>
             <ArrowLeft size={24} strokeWidth={2} />
           </button>
           <div className="meta-text">SPOTIFY</div>
-          <button onClick={() => handleVolumeChange(mediaState.volumePercent > 0 ? -100 : 50)}>
-            {mediaState.volumePercent === 0 ? (
-              <VolumeX size={24} strokeWidth={2} />
-            ) : (
-              <Volume2 size={24} strokeWidth={2} />
-            )}
-          </button>
+          <div className="w-6" />
+        </div>
+
+        {/* Voice command hint */}
+        <div className="text-center mb-4 pb-3 border-b border-black/20">
+          <div className="text-sm opacity-60">Say "play", "pause", "next song"</div>
         </div>
 
         {/* Now playing info */}

@@ -151,9 +151,14 @@ export default function NavPage() {
           <div className="w-6" />
         </div>
 
+        {/* Voice prompt */}
+        <div className="text-center mb-6 pb-4 border-b-2 border-black">
+          <div className="text-xl font-bold mb-2">Where to?</div>
+          <div className="text-sm opacity-60">Say "navigate to [place]"</div>
+        </div>
+
         {/* Search */}
         <div className="mb-6">
-          <div className="action-text text-center mb-4">Where to?</div>
           <input
             type="text"
             value={searchQuery}

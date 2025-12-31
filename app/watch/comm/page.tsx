@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Mic } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { messagingService } from '@/services/MessagingService';
 import type { MessageThread } from '@/models/types';
 
@@ -59,16 +59,17 @@ export default function CommHubPage() {
             <ArrowLeft size={24} strokeWidth={2} />
           </button>
           <div className="meta-text">WHATSAPP</div>
-          <button
-            onClick={() => router.push('/watch/voice')}
-            className="flex items-center gap-2"
-          >
-            <Mic size={24} strokeWidth={2} />
-          </button>
+          <div className="w-6" />
+        </div>
+
+        {/* Voice prompt */}
+        <div className="text-center mb-4 pb-4 border-b-2 border-black">
+          <div className="text-lg font-semibold mb-2">Recent Conversations</div>
+          <div className="text-sm opacity-60">Say "message [name]"</div>
         </div>
 
         {/* Conversations list */}
-        <div className="flex-1 overflow-auto -mx-6 px-6">
+        <div className="flex-1 overflow-auto -mx-6 px-6 mt-2">
           {loading ? (
             <div className="text-center mt-12">
               <div className="meta-text">LOADING...</div>
@@ -107,9 +108,9 @@ export default function CommHubPage() {
           )}
         </div>
 
-        {/* Voice shortcut hint */}
+        {/* Voice hint */}
         <div className="gesture-hint gesture-hint-bottom">
-          TAP MIC FOR VOICE
+          PRESS BUTTON TO SPEAK
         </div>
       </div>
     </div>
