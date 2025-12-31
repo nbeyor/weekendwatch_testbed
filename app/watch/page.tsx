@@ -171,9 +171,9 @@ export default function WatchHomePage() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-3">
         <button onClick={() => setMode('time')}>
-          <ArrowLeft size={24} strokeWidth={2} />
+          <ArrowLeft size={16} strokeWidth={2} />
         </button>
         <div className="meta-text">WHATSAPP</div>
         <div className="w-6" />
@@ -243,9 +243,9 @@ export default function WatchHomePage() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-2">
           <button onClick={() => setMode('time')}>
-            <ArrowLeft size={24} strokeWidth={2} />
+            <ArrowLeft size={16} strokeWidth={2} />
           </button>
           <div className="meta-text">SPOTIFY</div>
           <div className="w-6" />
@@ -268,12 +268,12 @@ export default function WatchHomePage() {
         <div className="flex-1 flex items-center justify-center">
           <button
             onClick={handlePlayPause}
-            className="w-32 h-32 border-4 border-black rounded-full flex items-center justify-center bg-black text-white active:opacity-70"
+            className="w-20 h-20 border-3 border-black rounded-full flex items-center justify-center bg-black text-white active:opacity-70"
           >
             {mediaState.playing ? (
-              <Pause size={64} strokeWidth={2} fill="white" />
+              <Pause size={40} strokeWidth={2} fill="white" />
             ) : (
-              <Play size={64} strokeWidth={2} fill="white" className="ml-2" />
+              <Play size={40} strokeWidth={2} fill="white" className="ml-1" />
             )}
           </button>
         </div>
@@ -283,8 +283,8 @@ export default function WatchHomePage() {
           disabled={!hasTrack}
           className="btn-watch-outline"
         >
-          <div className="flex items-center justify-center gap-2">
-            <SkipForward size={24} strokeWidth={2} />
+          <div className="flex items-center justify-center gap-1">
+            <SkipForward size={16} strokeWidth={2} />
             SKIP
           </div>
         </button>
@@ -349,7 +349,7 @@ export default function WatchHomePage() {
           <div className="flex items-center justify-between mb-4">
             <div className="meta-text">GOOGLE MAPS</div>
             <button onClick={handleClearRoute}>
-              <X size={24} strokeWidth={2} />
+              <X size={16} strokeWidth={2} />
             </button>
           </div>
 
@@ -361,7 +361,7 @@ export default function WatchHomePage() {
           </div>
 
           <div className="flex-1 flex items-center justify-center">
-            <DirectionIcon size={120} strokeWidth={1.5} />
+            <DirectionIcon size={72} strokeWidth={1.5} />
           </div>
 
           <div className="text-center mb-6">
@@ -388,9 +388,9 @@ export default function WatchHomePage() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-3">
           <button onClick={() => setMode('time')}>
-            <ArrowLeft size={24} strokeWidth={2} />
+            <ArrowLeft size={16} strokeWidth={2} />
           </button>
           <div className="meta-text">GOOGLE MAPS</div>
           <div className="w-6" />
@@ -409,9 +409,9 @@ export default function WatchHomePage() {
               <button
                 key={dest}
                 onClick={() => handleQuickDest(dest)}
-                className="w-full border-2 border-black p-3 flex items-center gap-3 active:opacity-50"
+                className="w-full border-2 border-black p-2 flex items-center gap-2 active:opacity-50"
               >
-                <MapPin size={20} strokeWidth={2} />
+                <MapPin size={16} strokeWidth={2} />
                 <span className="text-base font-medium">{dest}</span>
               </button>
             ))}
@@ -430,18 +430,18 @@ export default function WatchHomePage() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-3">
         <button onClick={() => setMode('time')}>
-          <ArrowLeft size={24} strokeWidth={2} />
+          <ArrowLeft size={16} strokeWidth={2} />
         </button>
         <div className="meta-text">SETTINGS</div>
         <div className="w-6" />
       </div>
 
       <div className="context-card">
-        <SettingsIcon size={80} strokeWidth={1.5} />
-        <div className="action-text mt-6">Settings</div>
-        <div className="text-base opacity-60 mt-2">Customize your watch</div>
+        <SettingsIcon size={48} strokeWidth={1.5} />
+        <div className="action-text mt-3">Settings</div>
+        <div className="text-sm opacity-60 mt-1">Customize your watch</div>
       </div>
 
       <button

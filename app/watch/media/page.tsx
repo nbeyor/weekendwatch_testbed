@@ -97,27 +97,27 @@ export default function MediaPage() {
         onTouchEnd={handleTouchEnd}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-2">
           <button onClick={() => router.push('/watch')}>
-            <ArrowLeft size={24} strokeWidth={2} />
+            <ArrowLeft size={16} strokeWidth={2} />
           </button>
           <div className="meta-text">SPOTIFY</div>
-          <div className="w-6" />
+          <div className="w-4" />
         </div>
 
         {/* Voice command hint */}
-        <div className="text-center mb-4 pb-3 border-b border-black/20">
+        <div className="text-center mb-2 pb-2 border-b border-black/20">
           <div className="text-sm opacity-60">Say "play", "pause", "next song"</div>
         </div>
 
         {/* Now playing info */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <div className="text-lg font-bold mb-2 truncate">
             {hasTrack ? mediaState.trackTitle : 'Not Playing'}
           </div>
           {hasTrack && (
             <>
-              <div className="text-base opacity-60 truncate mb-4">
+              <div className="text-base opacity-60 truncate mb-2">
                 {mediaState.artist}
               </div>
               <div className="meta-text">
@@ -131,56 +131,56 @@ export default function MediaPage() {
         <div className="flex-1 flex items-center justify-center">
           <button
             onClick={handlePlayPause}
-            className="w-32 h-32 border-4 border-black rounded-full flex items-center justify-center bg-black text-white active:opacity-70"
+            className="w-20 h-20 border-3 border-black rounded-full flex items-center justify-center bg-black text-white active:opacity-70"
           >
             {mediaState.playing ? (
-              <Pause size={64} strokeWidth={2} fill="white" />
+              <Pause size={40} strokeWidth={2} fill="white" />
             ) : (
-              <Play size={64} strokeWidth={2} fill="white" className="ml-2" />
+              <Play size={40} strokeWidth={2} fill="white" className="ml-1" />
             )}
           </button>
         </div>
 
         {/* Skip controls */}
-        <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center justify-between gap-2 mb-3">
           <button
             onClick={() => handleSkip('back')}
             disabled={!hasTrack}
             className="btn-watch-outline flex-1"
           >
-            <SkipBack size={32} strokeWidth={2} className="mx-auto" />
+            <SkipBack size={20} strokeWidth={2} className="mx-auto" />
           </button>
           <button
             onClick={() => handleSkip('forward')}
             disabled={!hasTrack}
             className="btn-watch-outline flex-1"
           >
-            <SkipForward size={32} strokeWidth={2} className="mx-auto" />
+            <SkipForward size={20} strokeWidth={2} className="mx-auto" />
           </button>
         </div>
 
         {/* Volume indicator */}
-        <div className="border-t-2 border-black pt-4">
-          <div className="flex items-center justify-between mb-2">
+        <div className="border-t-2 border-black pt-2">
+          <div className="flex items-center justify-between mb-1">
             <div className="meta-text">VOLUME</div>
             <div className="text-lg font-bold">{mediaState.volumePercent}%</div>
           </div>
-          <div className="h-3 border-2 border-black">
+          <div className="h-2 border-2 border-black">
             <div
               className="h-full bg-black transition-all"
               style={{ width: `${mediaState.volumePercent}%` }}
             />
           </div>
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-1 mt-1">
             <button
               onClick={() => handleVolumeChange(-10)}
-              className="btn-watch-outline flex-1 !min-h-0 !py-2"
+              className="btn-watch-outline flex-1 !min-h-0 !py-1"
             >
               -
             </button>
             <button
               onClick={() => handleVolumeChange(10)}
-              className="btn-watch-outline flex-1 !min-h-0 !py-2"
+              className="btn-watch-outline flex-1 !min-h-0 !py-1"
             >
               +
             </button>

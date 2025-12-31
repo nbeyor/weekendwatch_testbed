@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 /* WeekendWatch - Radically Simple Watch Interface */
+/* Display: 218x218 pixels (Fossil Neutra - top e-ink wrist display) */
 :root {
-  --watch-width: 360px;
-  --watch-height: 360px;
+  --watch-width: 218px;
+  --watch-height: 218px;
 
-  /* Typography scale - much larger for watch */
-  --text-xs: 0.75rem;   /* 12px - meta info */
-  --text-sm: 1rem;      /* 16px - secondary */
-  --text-base: 1.5rem;  /* 24px - body */
-  --text-lg: 2rem;      /* 32px - emphasis */
-  --text-xl: 3rem;      /* 48px - primary */
-  --text-2xl: 4rem;     /* 64px - time/numbers */
-  --text-3xl: 6rem;     /* 96px - hero time */
+  /* Typography scale - optimized for 218x218 e-ink display */
+  --text-xs: 0.5rem;      /* 8px - meta info */
+  --text-sm: 0.625rem;    /* 10px - secondary */
+  --text-base: 0.875rem;  /* 14px - body */
+  --text-lg: 1.125rem;    /* 18px - emphasis */
+  --text-xl: 1.75rem;     /* 28px - primary */
+  --text-2xl: 2.5rem;     /* 40px - time/numbers */
+  --text-3xl: 3.5rem;     /* 56px - hero time */
 }
 
 body {
@@ -37,9 +38,9 @@ body {
 /* Watch buttons - large, simple tap targets */
 .btn-watch {
   width: 100%;
-  min-height: 4rem;
-  padding: 1rem;
-  border: 3px solid black;
+  min-height: 2.5rem;
+  padding: 0.625rem;
+  border: 2px solid black;
   background-color: black;
   color: white;
   font-size: var(--text-lg);
@@ -53,9 +54,9 @@ body {
 
 .btn-watch-outline {
   width: 100%;
-  min-height: 4rem;
-  padding: 1rem;
-  border: 3px solid black;
+  min-height: 2.5rem;
+  padding: 0.625rem;
+  border: 2px solid black;
   background-color: white;
   color: black;
   font-size: var(--text-lg);
@@ -69,9 +70,9 @@ body {
 
 /* Circle action button */
 .btn-circle {
-  width: 5rem;
-  height: 5rem;
-  border: 3px solid black;
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid black;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -174,8 +175,8 @@ body {
 
 /* Watch viewport - full screen modes */
 .watch-container {
-  width: 360px;
-  height: 360px;
+  width: 218px;
+  height: 218px;
   margin: 0 auto;
   background-color: white;
   overflow: hidden;
@@ -188,7 +189,7 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 0.75rem;
 }
 
 /* Hero time display */
@@ -216,7 +217,7 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 1rem 0.5rem;
 }
 
 /* Large action text */
@@ -387,32 +388,32 @@ body {
 .watch-bezel {
   position: relative;
   margin: 0 auto;
-  width: 380px;
-  height: 400px;
+  width: 238px;
+  height: 258px;
 }
 
 .watch-bezel::before {
   content: '';
   position: absolute;
   inset: 0;
-  border: 8px solid black;
+  border: 6px solid black;
   pointer-events: none;
-  border-radius: 50px;
+  border-radius: 30px;
 }
 
 .watch-bezel-screen {
   position: absolute;
-  top: 20px;
+  top: 14px;
   left: 10px;
-  width: 360px;
-  height: 360px;
+  width: 218px;
+  height: 218px;
   overflow: hidden;
 }
 
 /* Tap target minimum size */
 .tap-target {
-  min-width: 2.75rem;
-  min-height: 2.75rem;
+  min-width: 2rem;
+  min-height: 2rem;
 }
 
 /* Truncate text utilities */
